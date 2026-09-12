@@ -10,19 +10,29 @@ function App() {
     error: authError,
     loginWithRedirect: login,
     logout: auth0Logout,
+    getAccessTokenSilently,
     user,
   } = useAuth0()
 
   const [products, setProducts] = useState<Product[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    fetchProducts()
+    if (!isAuthenticated) {
+      setProducts([])
+      return
+    }
+
+    setLoading(true)
+    setError(null)
+
+    getAccessTokenSilently()
+      .then(fetchProducts)
       .then(setProducts)
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false))
-  }, [])
+  }, [isAuthenticated, getAccessTokenSilently])
 
   const signup = () => login({ authorizationParams: { screen_hint: 'signup' } })
   const logout = () => auth0Logout({ logoutParams: { returnTo: window.location.origin } })
@@ -48,10 +58,11 @@ function App() {
 
       <h1>Products</h1>
 
+      {!isAuthenticated && <p>Log in to view products.</p>}
       {loading && <p>Loading products...</p>}
       {error && <p>Error: {error}</p>}
 
-      {!loading && !error && (
+      {isAuthenticated && !loading && !error && (
         <ul className="product-list">
           {products.map((product) => (
             <li key={product.id} className="product-card">

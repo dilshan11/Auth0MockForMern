@@ -29,28 +29,29 @@ Tracks what has been implemented so far and what remains. See
 - [ ] Allowed Callback URLs set to `http://localhost:5173`
 - [ ] Allowed Logout URLs set to `http://localhost:5173`
 - [ ] Allowed Web Origins set to `http://localhost:5173`
-- [ ] Auth0 API created (Identifier/audience) for the backend
+- [x] Auth0 API created (Identifier/audience: `https://chiraaiya-api`)
 
 ### Auth0 — Phase 3 (frontend login integration)
 - [x] Installed `@auth0/auth0-react`
 - [x] Pinned Vite dev server to port `5173` with `strictPort`
-- [x] `FE/.env` + `.env.example` with `VITE_AUTH0_DOMAIN` / `VITE_AUTH0_CLIENT_ID`
-- [x] `Auth0Provider` wired in `main.tsx`
+- [x] `FE/.env` + `.env.example` with `VITE_AUTH0_DOMAIN` / `VITE_AUTH0_CLIENT_ID` / `VITE_AUTH0_AUDIENCE`
+- [x] `Auth0Provider` wired in `main.tsx` (now requests `audience`)
 - [x] Login / Signup / Logout buttons + logged-in email display in `App.tsx`
 - [ ] End-to-end login test (blocked on Phase 1 dashboard URLs above)
 
+### Auth0 — Phase 2 (backend JWT validation)
+- [x] Installed `express-oauth2-jwt-bearer` + `dotenv`
+- [x] Added `BE/.env` + `.env.example` with `AUTH0_DOMAIN` and `AUTH0_AUDIENCE`
+- [x] Created `checkJwt` middleware (`BE/src/middleware/auth.ts`)
+- [x] Applied middleware to product routes
+- [x] Added 401 error handler for invalid/missing tokens (verified: unauthenticated request returns 401)
+
 ## To Do
 
-### Auth0 — Phase 2 (backend JWT validation) — not started
-- [ ] Install `express-oauth2-jwt-bearer`
-- [ ] Add `BE/.env` with `AUTH0_DOMAIN` and `AUTH0_AUDIENCE`
-- [ ] Create `checkJwt` middleware
-- [ ] Apply middleware to product routes
-- [ ] Add 401 error handler for invalid/missing tokens
-
-### Auth0 — Phase 4 (connect FE to protected BE endpoint) — not started
-- [ ] Attach `Authorization: Bearer <token>` (via `getAccessTokenSilently()`) to `fetchProducts`
-- [ ] End-to-end test: logged-in fetch succeeds, logged-out fetch fails/blocked
+### Auth0 — Phase 4 (connect FE to protected BE endpoint)
+- [x] Attach `Authorization: Bearer <token>` (via `getAccessTokenSilently()`) to `fetchProducts`
+- [x] Products UI only fetches/renders when `isAuthenticated`, shows "Log in to view products." otherwise
+- [ ] End-to-end test in browser: logged-in fetch succeeds, logged-out fetch fails/blocked (needs manual login — see Immediate Next Step)
 
 ### Auth0 — Phase 5 (role-based authorization) — optional, deferred
 - [ ] Define permissions (`read:products`, `write:products`) in Auth0 API settings, enable RBAC
@@ -64,6 +65,8 @@ Tracks what has been implemented so far and what remains. See
 - [ ] Initial commit/push of `FE` and `BE` to the repo (not yet pushed)
 
 ## Immediate Next Step
-Waiting on Auth0 dashboard config (Callback/Logout/Web Origin URLs, and creating
-the API for the backend) before Phase 2 (backend JWT validation) and the
-end-to-end login test can proceed.
+Set Allowed Callback URLs / Logout URLs / Web Origins to `http://localhost:5173`
+on the Auth0 SPA Application (Phase 1 — still unchecked). Then restart the FE
+dev server (env vars are only read on startup) and manually test in the
+browser: log in → products load; log out → "Log in to view products." shown
+and `GET /api/products` returns 401 without a token.
