@@ -1,3 +1,10 @@
+.auth-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
 .product-list {
   list-style: none;
   display: grid;
